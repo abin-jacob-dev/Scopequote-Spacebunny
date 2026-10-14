@@ -1,0 +1,13 @@
+{
+  "name": "scopequote-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test",
+    "test:e2e": "playwright test",
+    "test:e2e:retry": "playwright test --config=playwright.retry.config.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}

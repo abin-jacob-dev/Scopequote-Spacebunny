@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Something went wrong — Scopequote{% endblock %}
+
+{% block content %}
+  <section class="empty-state" aria-labelledby="error-500-title">
+    <h1 id="error-500-title">Something went wrong.</h1>
+    <p>Scopequote could not complete that request. Your submitted form values have not been made authoritative; try again when you are ready.</p>
+    <div class="button-row">
+      <a class="button" href="{% url 'core:home' %}">Return home</a>
+      <a class="button button--primary" href="{% url 'quotes:estimator' %}">Return to estimator</a>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Access unavailable — Scopequote{% endblock %}
+
+{% block content %}
+  <section class="empty-state" aria-labelledby="error-403-title">
+    <h1 id="error-403-title">You do not have access to this page.</h1>
+    <p>Return to your quotation desk or start a new estimate. If you believe you should have access, sign in with the account that owns the record.</p>
+    <div class="button-row">
+      <a class="button" href="{% url 'accounts:login' %}">Sign in</a>
+      <a class="button button--primary" href="{% url 'quotes:estimator' %}">Estimate a project</a>
+    </div>
+  </section>
+{% endblock %}

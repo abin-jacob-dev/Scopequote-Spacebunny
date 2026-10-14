@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load form_extras %}
+
+{% block title %}Create an account — Scopequote{% endblock %}
+{% block meta_description %}Create a Scopequote account to save quotation history and private client links.{% endblock %}
+{% block body_class %}account-page{% endblock %}
+
+{% block content %}
+  <section class="form-shell measure" aria-labelledby="signup-title">
+    <h1 id="signup-title">Create your Scopequote account</h1>
+    <p class="lede">Save estimates and keep a private history of the work you quote.</p>
+
+    <form method="post" action="{% url 'accounts:signup' %}" data-scopequote-pending>
+      {% csrf_token %}
+      {% if form.errors %}
+        <div class="error-summary" role="alert" aria-labelledby="signup-errors-title">
+          <h2 id="signup-errors-title" tabindex="-1" data-scopequote-focus-target="true">There are errors to fix</h2>
+          <ul class="error-list">
+            {% if form.non_field_errors %}{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}{% endif %}
+            {% for field in form %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}{% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+      <div class="form-field">
+        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+        {% field form.email %}
+        {% if form.email.errors %}<ul id="{{ form.email.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.email.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="form-field">
+        <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+        {% field form.password1 %}
+        {% if form.password1.errors %}<ul id="{{ form.password1.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.password1.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="form-field">
+        <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+        {% field form.password2 %}
+        {% if form.password2.errors %}<ul id="{{ form.password2.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.password2.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="button-row"><button class="button button--primary" type="submit">Create account</button><span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span></div>
+    </form>
+
+    <hr class="rule">
+    <p>Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a>.</p>
+  </section>
+{% endblock %}

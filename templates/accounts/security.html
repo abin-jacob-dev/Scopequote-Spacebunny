@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load form_extras %}
+
+{% block title %}Security settings — Scopequote{% endblock %}
+{% block meta_description %}Change your Scopequote password and review account security.{% endblock %}
+{% block body_class %}account-page{% endblock %}
+
+{% block content %}
+  <section class="form-shell measure" aria-labelledby="security-title">
+    <h1 id="security-title">Security settings</h1>
+    <p class="lede">Changing your password signs out stale sessions and keeps your account protected.</p>
+    <form method="post" data-scopequote-pending>
+      {% csrf_token %}
+      {% if form.errors %}
+        <div class="error-summary" role="alert" aria-labelledby="security-errors-title">
+          <h2 id="security-errors-title" tabindex="-1" data-scopequote-focus-target="true">There are errors to fix</h2>
+          <ul class="error-list">
+            {% if form.non_field_errors %}{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}{% endif %}
+            {% for field in form %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}{% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+      {% for field in form %}
+        <div class="form-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {% field field %}
+          {% if field.help_text %}<p class="form-help">{{ field.help_text }}</p>{% endif %}
+          {% if field.errors %}<ul id="{{ field.id_for_label }}_error" class="field-errors" role="alert">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+      {% endfor %}
+      <div class="button-row"><button class="button button--primary" type="submit">Change password</button><span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span></div>
+    </form>
+    <hr class="rule">
+    <p><a class="button button--danger" href="{% url 'accounts:delete' %}">Delete your account</a></p>
+  </section>
+{% endblock %}

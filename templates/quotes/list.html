@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load form_extras %}
+
+{% block title %}Your quotes — Scopequote{% endblock %}
+{% block meta_description %}Search and filter your saved Scopequote quotations.{% endblock %}
+{% block body_class %}quote-list-page{% endblock %}
+
+{% block content %}
+  <section class="page-intro" aria-labelledby="quotes-title">
+    <h1 id="quotes-title">Your quotes</h1>
+    <p class="lede">Search saved work by project, client, or quote number, then narrow the list by status.</p>
+  </section>
+
+  <section class="form-shell" aria-labelledby="filter-title">
+    <h2 id="filter-title" class="sr-only">Filter quotes</h2>
+    <form method="get" action="{% url 'accounts:quote-list' %}" role="search">
+       {% if form.errors %}
+         <div class="error-summary" role="alert" aria-labelledby="filter-errors-title">
+           <h2 id="filter-errors-title" tabindex="-1" data-scopequote-focus-target="true">Check the filter values and try again.</h2>
+           <ul class="error-list">
+             {% if form.non_field_errors %}{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}{% endif %}
+             {% for field in form %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}{% endfor %}
+           </ul>
+         </div>
+       {% endif %}
+      <div class="section-grid">
+        <div class="form-field">
+          <label for="{{ form.q.id_for_label }}">{{ form.q.label }}</label>
+          {% field form.q %}
+          {% if form.q.errors %}<ul id="{{ form.q.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.q.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <div class="form-field">
+          <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+          {% field form.status %}
+          {% if form.status.errors %}<ul id="{{ form.status.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.status.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+      </div>
+      <div class="button-row"><button class="button button--primary" type="submit">Filter quotes</button></div>
+    </form>
+  </section>
+
+  <section class="page-section" aria-labelledby="results-title">
+    <div class="page-section__header">
+      <div>
+        <h2 id="results-title">{{ quote_count }} matching quote{{ quote_count|pluralize }}</h2>
+      </div>
+      <a class="button" href="{% url 'accounts:quote-list' %}">Clear filters</a>
+    </div>
+    {% if quotes %}
+      <div class="data-table-wrap">
+        <table>
+          <caption>Your quotations</caption>
+          <thead><tr><th scope="col">Project</th><th scope="col">Status</th><th scope="col">Total</th><th scope="col">Updated</th></tr></thead>
+          <tbody>
+            {% for quote in quotes %}
+              <tr>
+                <td><a href="{% url 'quotes:detail' pk=quote.pk %}">{{ quote.project_title|default:"Untitled quote" }}</a></td>
+                <td><span class="status-pill status-pill--muted">{{ quote.get_status_display }}</span></td>
+                <td class="quote-list__amount">{{ quote.currency }} {{ quote.chosen_total }}</td>
+                <td>{{ quote.updated_at|date:"j M Y" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <h3>No quotes match these filters.</h3>
+        <p>Clear the filters or start a new estimate.</p>
+        <div class="button-row">
+          <a class="button" href="{% url 'accounts:quote-list' %}">Clear filters</a>
+          <a class="button button--primary" href="{% url 'quotes:estimator' %}">Start an estimate</a>
+        </div>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,22 @@
+.env
+.env.*
+!.env.example
+.git/
+.venv/
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.pytest_cache/
+node_modules/
+playwright-report/
+test-results/
+media/
+staticfiles/
+postgres-data/
+*.sqlite3
+*.sqlite
+*.db
+*.log
+graphify-out/
+.superpowers/
+opencode session.txt

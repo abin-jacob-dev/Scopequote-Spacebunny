@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load form_extras %}
+
+{% block title %}Sign in — Scopequote{% endblock %}
+{% block meta_description %}Sign in to manage your Scopequote estimates and private quotations.{% endblock %}
+{% block body_class %}account-page{% endblock %}
+
+{% block content %}
+  <section class="form-shell measure" aria-labelledby="login-title">
+    <h1 id="login-title">Sign in to Scopequote</h1>
+    <p class="lede">Keep your estimates, quotations, and private client links in one place.</p>
+
+    <form method="post" action="{% url 'accounts:login' %}" data-scopequote-pending>
+      {% csrf_token %}
+      {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+      {% if form.errors %}
+        <div class="error-summary" role="alert" aria-labelledby="login-errors-title">
+          <h2 id="login-errors-title" tabindex="-1" data-scopequote-focus-target="true">Check the details below and try again.</h2>
+          <ul class="error-list">
+            {% if form.non_field_errors %}{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}{% endif %}
+            {% for field in form %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}{% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+      <div class="form-field">
+        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+        {% field form.email %}
+        {% if form.email.errors %}<ul id="{{ form.email.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.email.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="form-field">
+        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+        {% field form.password %}
+        {% if form.password.errors %}<ul id="{{ form.password.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.password.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="button-row"><button class="button button--primary" type="submit">Sign in</button><span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span></div>
+    </form>
+
+    <hr class="rule">
+    <p><a href="{% url 'accounts:password-reset' %}">Forgot your password?</a></p>
+    <p>New to Scopequote? <a href="{% url 'accounts:signup' %}">Create an account</a>.</p>
+  </section>
+{% endblock %}

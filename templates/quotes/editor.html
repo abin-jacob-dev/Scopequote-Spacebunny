@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% load form_extras %}
+
+{% block title %}Quote editor — Scopequote{% endblock %}
+{% block meta_description %}Shape the scope, investment, schedule, and terms of a Scopequote quotation.{% endblock %}
+{% block body_class %}editor-page{% endblock %}
+
+{% block content %}
+  <section class="page-intro" aria-labelledby="editor-title">
+    <p><a href="{% if quote %}{% url 'quotes:detail' pk=quote.pk %}{% else %}{% url 'accounts:dashboard' %}{% endif %}">Back to {% if quote %}quote{% else %}dashboard{% endif %}</a></p>
+    <div class="button-row">
+      <span class="status-pill status-pill--confidence" role="status">{{ status_label }}</span>
+      <span class="document-state">{% if quote and not quote.is_draft %}Published immutable version{% else %}Draft document{% endif %}</span>
+    </div>
+    <h1 id="editor-title">Quote editor</h1>
+    <p class="lede">Shape the scope, investment, and delivery details. The total is always calculated from the line items.</p>
+  </section>
+
+  {% if conflict %}
+    <div class="error-summary" role="alert" aria-labelledby="editor-conflict-title">
+      <h2 id="editor-conflict-title" tabindex="-1" data-scopequote-focus-target="true">Review before saving</h2>
+      <p>{{ conflict_message|default:"This quote changed in another tab." }}</p>
+    </div>
+    {% if current_form %}
+      <section class="conflict-state" aria-labelledby="current-state-title">
+        <h3 id="current-state-title">Current saved values</h3>
+        <p>Project title: {{ current_form.project_title.value|default:"Not set" }}</p>
+        <p>Client: {{ current_form.client_name.value|default:"Not set" }}</p>
+        <p>Validity: {{ current_form.issue_date.value|default:"Not set" }} to {{ current_form.valid_until.value|default:"Not set" }}</p>
+      </section>
+    {% endif %}
+    {% if current_formset %}
+      <section class="conflict-state" data-current-formset aria-labelledby="current-line-items-title">
+        <h3 id="current-line-items-title">Current saved line items</h3>
+        <ul>
+          {% for current_line_form in current_formset %}
+            <li>
+              <strong>{{ current_line_form.initial.label|default:"Line item" }}</strong>
+              <span>{{ current_line_form.initial.description|default:"—" }}</span>
+              <span>{{ current_line_form.initial.amount|default:"—" }}</span>
+            </li>
+          {% empty %}
+            <li>No saved line items.</li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+  {% endif %}
+
+  {% if form.errors or line_item_formset.errors %}
+    <div class="error-summary" role="alert" aria-labelledby="editor-errors-title">
+      <h2 id="editor-errors-title" tabindex="-1" data-scopequote-focus-target="true">There are errors to fix</h2>
+      <p>Review the highlighted fields and line items before saving this draft.</p>
+      <ul class="error-list">
+        {% if form.non_field_errors %}{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}{% endif %}
+        {% for field in form %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}{% endfor %}
+        {% if line_item_formset.non_field_errors %}{% for error in line_item_formset.non_field_errors %}<li>{{ error }}</li>{% endfor %}{% endif %}
+        {% for line_form in line_item_formset %}{% for field in line_form.visible_fields %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}{% endfor %}{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="editor-layout">
+    <section class="form-shell" aria-labelledby="editor-form-title">
+      <h2 id="editor-form-title" class="sr-only">Quotation fields</h2>
+      <form method="post" enctype="multipart/form-data" novalidate data-scopequote-pending>
+        {% csrf_token %}
+         {% field form.updated_at %}
+
+
+        <fieldset>
+          <legend>Client and project</legend>
+          {% for field in form %}
+            {% if field.name == "project_title" or field.name == "project_description" or field.name == "category" or field.name == "client_name" or field.name == "client_company" or field.name == "client_email" %}
+              <div class="form-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% field field %}
+                {% if field.help_text %}<p class="form-help">{{ field.help_text }}</p>{% endif %}
+                {% if field.errors %}<ul id="{{ field.id_for_label }}_error" class="field-errors" role="alert">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </fieldset>
+
+        <fieldset>
+          <legend>Scope and pricing</legend>
+          {% for field in form %}
+            {% if field.name == "delivery_days" or field.name == "complexity" or field.name == "revision_rounds" or field.name == "urgency" or field.name == "experience" or field.name == "currency" or field.name == "deposit_percentage" %}
+              <div class="form-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% field field %}
+                {% if field.help_text %}<p class="form-help">{{ field.help_text }}</p>{% endif %}
+                {% if field.errors %}<ul id="{{ field.id_for_label }}_error" class="field-errors" role="alert">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+          {% if estimate %}
+            <p class="alert alert-info" role="status">Recommended range: {{ estimate.minimum }}–{{ estimate.maximum }} {{ form.currency.value }}. Recommended hourly equivalent: {{ estimate.hourly_equivalent }}.</p>
+          {% endif %}
+        </fieldset>
+
+        <fieldset>
+          <legend>Investment line items</legend>
+          <p class="muted">Use one to fifty items. Amounts may include discounts, but the total must be positive.</p>
+          {% if suggested_deliverables %}
+            <aside class="suggested-scope" aria-labelledby="suggested-deliverables-title">
+              <h3 id="suggested-deliverables-title">Suggested deliverables</h3>
+              <p>Use these as an editable starting point:</p>
+              <ul class="prose-list">
+                {% for deliverable in suggested_deliverables %}<li><span>{{ deliverable }}</span></li>{% endfor %}
+              </ul>
+            </aside>
+          {% endif %}
+          {% if line_item_formset %}
+            {{ line_item_formset.management_form }}
+            {% for line_form in line_item_formset %}
+              <div class="line-item-row">
+                {% for hidden in line_form.hidden_fields %}{{ hidden }}{% endfor %}
+                {% for field in line_form.visible_fields %}
+                  <div class="form-field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% field field %}
+                    {% if field.help_text %}<p class="form-help">{{ field.help_text }}</p>{% endif %}
+                    {% if field.errors %}<ul id="{{ field.id_for_label }}_error" class="field-errors" role="alert">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="muted">A project-fee line item will be seeded from the current estimate.</p>
+          {% endif %}
+        </fieldset>
+
+        <fieldset>
+          <legend>Schedule and terms</legend>
+          {% for field in form %}
+            {% if field.name == "issue_date" or field.name == "valid_until" or field.name == "timeline" or field.name == "revision_terms" or field.name == "terms" or field.name == "notes" or field.name == "exclusions" or field.name == "taxes" or field.name == "cancellation_terms" %}
+              <div class="form-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% field field %}
+                {% if field.help_text %}<p class="form-help">{{ field.help_text }}</p>{% endif %}
+                {% if field.errors %}<ul id="{{ field.id_for_label }}_error" class="field-errors" role="alert">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </fieldset>
+
+        <fieldset>
+          <legend>Brand</legend>
+          {% for field in form %}
+            {% if field.name == "sender_name" or field.name == "sender_business_name" or field.name == "sender_email" or field.name == "sender_website" or field.name == "sender_monogram" or field.name == "accent_color" or field.name == "logo" %}
+              <div class="form-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% field field %}
+                {% if field.help_text %}<p class="form-help">{{ field.help_text }}</p>{% endif %}
+                {% if field.errors %}<ul id="{{ field.id_for_label }}_error" class="field-errors" role="alert">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </fieldset>
+
+        <div class="button-row">
+          <button class="button button--primary" type="submit">Save draft</button>
+          <span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span>
+          {% if quote %}<a class="button" href="{% url 'quotes:detail' pk=quote.pk %}">Cancel</a>{% endif %}
+        </div>
+      </form>
+    </section>
+
+    <section class="quote-preview" aria-labelledby="preview-title" data-scopequote-summary>
+      <h2 id="preview-title">Quotation preview</h2>
+      <p class="muted">Last-saved summary. Save the draft to refresh this preview.</p>
+      <article class="quote-preview__paper">
+        <header>
+          <p class="document-label">{{ status_label }}</p>
+          <h3>{{ form.project_title.value|default:"Untitled project" }}</h3>
+          <p>{{ form.client_name.value|default:"Client name" }}</p>
+        </header>
+        <p>{{ form.project_description.value|default:"Project overview" }}</p>
+        <dl>
+          <dt>Total</dt><dd>{{ quote.chosen_total|default:"—" }} {{ form.currency.value }}</dd>
+          <dt>Deposit</dt><dd>{{ quote.deposit_amount|default:"—" }} {{ form.currency.value }}</dd>
+          <dt>Realized hourly equivalent</dt><dd>{{ realized_hourly|default:"—" }}</dd>
+          <dt>Recommended hourly equivalent</dt><dd>{{ recommended_hourly|default:"—" }}</dd>
+        </dl>
+      </article>
+    </section>
+  </div>
+{% endblock %}

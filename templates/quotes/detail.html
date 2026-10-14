@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Quote details — Scopequote{% endblock %}
+{% block meta_description %}Review the saved Scopequote quotation and its current status.{% endblock %}
+{% block body_class %}quote-detail-page{% endblock %}
+
+{% block content %}
+  <section class="page-intro" aria-labelledby="quote-title">
+    <p><a href="{% url 'accounts:quote-list' %}">Back to quotes</a></p>
+    <div class="button-row">
+      <span class="status-pill status-pill--confidence" role="status">{{ quote.get_status_display }}</span>
+      <span class="document-state">{% if version %}Published immutable version{% else %}Draft document{% endif %}</span>
+    </div>
+    <h1 id="quote-title">{{ quote.project_title|default:"Untitled quote" }}</h1>
+    {% if quote.quote_number %}<p class="metadata">Quote {{ quote.quote_number }}</p>{% endif %}
+  </section>
+
+  {% if duplicate_confirmation %}
+    <div class="alert alert-info" role="status" aria-labelledby="duplicate-title">
+      <h2 id="duplicate-title">Start a new draft</h2>
+      <p>Duplicating copies the commercial details and line items, but does not copy versions or private links.</p>
+       <form method="post" data-scopequote-pending data-scopequote-confirm="Duplicate this quote as a new draft?">
+        {% csrf_token %}
+         <button class="button button--primary" type="submit">Duplicate as a new draft</button>
+         <span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span>
+      </form>
+    </div>
+  {% endif %}
+
+  <div class="split-layout">
+    <section class="card" aria-labelledby="commercial-title">
+      <h2 id="commercial-title">The offer at a glance</h2>
+      <dl class="public-details">
+        <dt>Client</dt><dd>{{ snapshot.client.name|default:quote.client_name|default:"Not set" }}</dd>
+        <dt>Project overview</dt><dd>{{ snapshot.project.description|default:quote.project_description|default:"Not set" }}</dd>
+        <dt>Total</dt><dd>{{ chosen_total }} {{ snapshot.currency|default:quote.currency }}</dd>
+        <dt>Deposit</dt><dd>{{ snapshot.deposit_amount|default:quote.deposit_amount }} {{ snapshot.currency|default:quote.currency }}</dd>
+        <dt>Realized hourly equivalent</dt><dd>{{ realized_hourly_equivalent|default:"Not available" }}</dd>
+        <dt>Recommended hourly equivalent</dt><dd>{{ hourly_equivalent|default:"Not available" }}</dd>
+        <dt>Validity</dt><dd>{{ snapshot.dates.issue_date|default:quote.issue_date|default:"Not set" }} to {{ snapshot.dates.valid_until|default:quote.valid_until|default:"Not set" }}</dd>
+      </dl>
+    </section>
+
+    <aside class="actions-panel" aria-labelledby="quote-actions-title" data-scopequote-actions>
+      <h2 id="quote-actions-title">Next steps</h2>
+      {% if can_edit %}
+        <p class="muted">This draft is still editable. Keep the scope and line-item total aligned before publishing.</p>
+        <div class="actions-panel__row">
+          <a class="button button--primary" href="{% url 'quotes:edit' pk=quote.pk %}">Edit draft</a>
+          <a class="button" href="{% url 'quotes:publish' pk=quote.pk %}">Review and publish</a>
+        </div>
+      {% else %}
+        <p class="muted">Published versions are immutable. Duplicate the quote when the scope needs to change.</p>
+        <div class="actions-panel__row">
+          <a class="button button--primary" href="{% url 'quotes:duplicate' pk=quote.pk %}">Duplicate to make changes</a>
+          <a class="button" href="{% url 'quotes:links' pk=quote.pk %}">Manage private links</a>
+        </div>
+      {% endif %}
+      <a href="{% url 'quotes:pdf' pk=quote.pk %}">Download PDF</a>
+    </aside>
+  </div>
+
+  <section class="page-section" aria-labelledby="investment-title">
+    <div class="page-section__header">
+      <div>
+        <h2 id="investment-title">Investment</h2>
+      </div>
+    </div>
+    <div class="data-table-wrap">
+      <table>
+        <caption>Line items</caption>
+        <thead><tr><th scope="col">Deliverable</th><th scope="col">Description</th><th scope="col">Amount</th></tr></thead>
+        <tbody>
+          {% for item in line_items %}
+            <tr><td>{{ item.label }}</td><td>{{ item.description }}</td><td>{{ item.amount }} {{ snapshot.currency|default:quote.currency }}</td></tr>
+          {% empty %}
+            <tr><td colspan="3">No line items yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="page-section" aria-labelledby="terms-title">
+    <h2 id="terms-title">Terms</h2>
+    <p>{{ snapshot.terms|default:quote.terms|default:"No terms have been added." }}</p>
+    {% if version %}<p class="muted">Published version {{ version.version_number }} is immutable.</p>{% endif %}
+  </section>
+
+  {% if response_events %}
+    <section class="page-section" aria-labelledby="response-history-title">
+      <h2 id="response-history-title">Client response history</h2>
+      <ul class="response-history">
+        {% for event in response_events %}
+          <li>
+            <strong>{{ event.get_event_type_display }}</strong>
+            <time datetime="{{ event.event_time|date:'c' }}">{{ event.event_time }}</time>
+            {% if event.note %}<p>{{ event.note }}</p>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+{% endblock %}

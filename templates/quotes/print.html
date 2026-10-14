@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% if project_title %}{{ project_title }}{% else %}Quotation{% endif %}</title>
+    <link rel="stylesheet" href="css/print.css">
+    <style nonce="{{ csp_nonce }}">
+      :root {
+        --scopequote-accent: {{ accent_color }};
+        --scopequote-accent-foreground: {{ accent_foreground }};
+      }
+    </style>
+  </head>
+  <body>
+    <header class="document-header">
+      {% if logo_data_uri %}<img class="document-logo" src="{{ logo_data_uri }}" alt="{{ sender_name }} logo">{% endif %}
+      <div class="brand-mark" aria-label="Sender monogram">{{ sender_monogram|default:"SQ" }}</div>
+      <div class="brand-copy">
+        <p class="eyebrow">Scopequote</p>
+        <p class="sender-name">{{ sender_name|default:"Scopequote" }}</p>
+        {% if sender_business_name %}<p>{{ sender_business_name }}</p>{% endif %}
+        {% if sender_email %}<p>{{ sender_email }}</p>{% endif %}
+        {% if sender_website %}<p class="long-value">{{ sender_website }}</p>{% endif %}
+      </div>
+      <div class="document-identity">
+        <p class="document-label document-label--accent">{{ document_label }}</p>
+        {% if quote_number %}<p>Quote {{ quote_number }}</p>{% else %}<p>Guest estimate</p>{% endif %}
+        {% if issue_date %}<p>Issued {{ issue_date }}</p>{% endif %}
+        {% if valid_until %}<p>Valid until {{ valid_until }}</p>{% endif %}
+      </div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <p class="eyebrow">Prepared for</p>
+        <h1>{{ project_title|default:"Project quotation" }}</h1>
+        <p class="client-name">
+          {{ client_name|default:"Guest" }}{% if client_company %} · {{ client_company }}{% endif %}
+        </p>
+        {% if client_email %}<p>{{ client_email }}</p>{% endif %}
+      </section>
+
+      <section class="commercial-summary">
+        <div>
+          <p class="eyebrow">Total</p>
+          <p class="amount">{{ chosen_total }} {{ currency }}</p>
+        </div>
+        {% if deposit_amount %}
+          <div>
+            <p class="eyebrow">Deposit</p>
+            <p class="secondary-amount">{{ deposit_amount }} {{ currency }}</p>
+            <p class="supporting">{{ deposit_percentage }}% of total</p>
+          </div>
+        {% endif %}
+        <div>
+          <p class="eyebrow">Estimated hours</p>
+          <p class="secondary-amount">{{ effective_hours|default:"Not specified" }}</p>
+          {% if hourly_equivalent %}
+            <p class="supporting">{{ hourly_equivalent }} {{ currency }} / hour</p>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="document-section">
+        <h2>Project overview</h2>
+        <div class="prose">{{ project_description|default:"No project overview has been added."|linebreaksbr }}</div>
+      </section>
+
+      <section class="document-section">
+        <h2>Scope</h2>
+        <dl class="scope-grid">
+          <div><dt>Category</dt><dd>{{ category|default:"Not specified" }}</dd></div>
+          <div><dt>Delivery</dt><dd>{{ delivery_days|default:"Not specified" }} focused days</dd></div>
+          <div><dt>Complexity</dt><dd>{{ complexity|default:"Not specified" }}</dd></div>
+          <div><dt>Revision rounds</dt><dd>{{ revision_rounds|default:"0" }}</dd></div>
+          <div><dt>Urgency</dt><dd>{{ urgency|default:"Not specified" }}</dd></div>
+          <div><dt>Experience</dt><dd>{{ experience|default:"Not specified" }}</dd></div>
+        </dl>
+        {% if timeline %}
+          <div class="term-block"><h3>Timeline</h3><div class="prose">{{ timeline|linebreaksbr }}</div></div>
+        {% endif %}
+        {% if revision_terms %}
+          <div class="term-block"><h3>Revision terms</h3><div class="prose">{{ revision_terms|linebreaksbr }}</div></div>
+        {% endif %}
+      </section>
+
+      <section class="document-section">
+        <h2>Investment</h2>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Deliverable</th>
+              <th scope="col">Description</th>
+              <th scope="col" class="amount-cell">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in line_items %}
+              <tr>
+                <td>{{ item.label }}</td>
+                <td>{{ item.description|default:"Project scope as described above." }}</td>
+                <td class="amount-cell">{{ item.amount }} {{ currency }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="3">No line items are listed.</td></tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" colspan="2">Total</th>
+              <td class="amount-cell">{{ chosen_total }} {{ currency }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </section>
+
+      <section class="document-section">
+        <h2>Terms</h2>
+        <div class="prose">{{ terms|default:"No terms have been added."|linebreaksbr }}</div>
+        {% if notes %}
+          <div class="term-block"><h3>Notes</h3><div class="prose">{{ notes|linebreaksbr }}</div></div>
+        {% endif %}
+        {% if exclusions %}
+          <div class="term-block"><h3>Exclusions</h3><div class="prose">{{ exclusions|linebreaksbr }}</div></div>
+        {% endif %}
+        {% if taxes %}
+          <div class="term-block"><h3>Taxes</h3><div class="prose">{{ taxes|linebreaksbr }}</div></div>
+        {% endif %}
+        {% if cancellation_terms %}
+          <div class="term-block"><h3>Cancellation</h3><div class="prose">{{ cancellation_terms|linebreaksbr }}</div></div>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+</html>

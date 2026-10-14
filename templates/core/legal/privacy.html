@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy — Scopequote{% endblock %}
+{% block meta_description %}How Scopequote handles account, quotation, and guest session data.{% endblock %}
+
+{% block content %}
+  <article class="legal-copy" aria-labelledby="privacy-title">
+    <h1 id="privacy-title">Privacy, in plain terms.</h1>
+    <p class="lede">Scopequote stores the information needed to calculate, save, share, and respond to quotations. This page describes the first release’s data boundaries.</p>
+
+    <h2>What Scopequote stores</h2>
+    <p>When you create an account, Scopequote stores your email address, password-derived account credentials, profile details, and the quotation records you choose to save. It stores the project, client, sender, scope, line-item, schedule, terms, status, and response information needed to present a quotation.</p>
+    <p>Guest estimates and guest quotations are held in a database-backed, signed session so the server can calculate and render them. The session has an absolute maximum lifetime of 14 days. Guest uploads that are staged but never completed are scheduled for cleanup within 24 hours.</p>
+
+    <h2>Private links and responses</h2>
+    <p>Published quotations use private, expiring links. The raw link token is not stored in application logs, analytics events, referrer data, or error messages. Owner-only history is scoped to the authenticated account. A client response is associated with the immutable published version that the client opened.</p>
+
+    <h2>Reference pricing</h2>
+    <p>The estimator uses code-owned reference rates and a versioned configuration. It does not use live foreign-exchange data, advertising profiles, or third-party enrichment services.</p>
+
+    <h2>Retention and deletion</h2>
+    <ul>
+      <li>Abandoned guest sessions expire after 14 days; staged guest uploads expire within 24 hours.</li>
+      <li>Authenticated accounts inactive for 24 months are eligible for the retention cleanup process.</li>
+      <li>Account deletion requests revoke links and sessions immediately, quarantine the account during a 30-day recovery window, and schedule database and media deletion within that window.</li>
+      <li>Quote versions, line items, events, and version-specific logos are deleted with their parent quote.</li>
+      <li>Application logs retain request metadata for 14 days and do not contain quote bodies, email addresses, tokens, or uploaded content.</li>
+      <li>Database backups expire within 35 days. Restored data is checked against deletion records and original expiry timestamps before serving traffic.</li>
+    </ul>
+
+    <h2>Security and access</h2>
+    <p>Scopequote uses password-protected sessions, CSRF protection on state-changing forms, owner-scoped queries, generic unavailable states for invalid private links, and restricted media types. No system can promise absolute security, but these controls reduce unnecessary exposure and keep commercial records scoped to the people who need them.</p>
+
+    <h2>Your choices</h2>
+    <p>You can edit profile defaults, remove saved quotations through the account lifecycle, and request account deletion after reauthentication. For a privacy question or deletion request, email <a href="mailto:{{ support_email|default:"support@scopequote.local" }}">{{ support_email|default:"support@scopequote.local" }}</a>.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>When the data practices change, this page should change with them. Contact <a href="mailto:{{ support_email|default:"support@scopequote.local" }}">{{ support_email|default:"support@scopequote.local" }}</a> with questions about the policy or operational retention procedures.</p>
+  </article>
+{% endblock %}

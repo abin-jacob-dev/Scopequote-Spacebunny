@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Terms — Scopequote{% endblock %}
+{% block meta_description %}Terms for using Scopequote's explainable pricing and quotation tools.{% endblock %}
+
+{% block content %}
+  <article class="legal-copy" aria-labelledby="terms-title">
+    <h1 id="terms-title">Use the guidance. Keep the judgment.</h1>
+    <p class="lede">These terms describe the first release of Scopequote, a workspace for independent freelancers and small creative studios to prepare and share quotations.</p>
+
+    <h2>The service</h2>
+    <p>Scopequote provides a deterministic pricing reference, editable quotation drafts, PDF exports, private quotation links, and client response records. It is a preparation and communication tool. It does not provide payments, contracts, invoicing, project management, automated client email, live currency conversion, or AI-generated estimates.</p>
+
+    <h2>Your account and content</h2>
+    <p>You are responsible for the accuracy of the project, client, sender, scope, schedule, and commercial terms you enter. Keep your credentials private and tell the account owner if you believe an account has been used without permission. You must not use Scopequote to distribute unlawful material, infringe rights, or attempt to access another person’s quotations.</p>
+
+    <h2>Reference pricing</h2>
+    <p>Reference rates, multipliers, and rounding rules are code-owned guidance. They are not live market data, a promise of client acceptance, or a guarantee of profitability. You remain responsible for the final price, taxes, payment terms, and contractual commitments you present to a client.</p>
+
+    <h2>Published quotations</h2>
+    <p>Publishing creates an immutable version of the commercial record. Later changes require a new draft. Private links are capability links: keep them confidential, do not publish them publicly, and revoke them when they are no longer needed. A client’s first response is recorded against the published version.</p>
+
+    <h2>Availability and changes</h2>
+    <p>Scopequote may change its reference configuration, interface, retention procedures, or availability as the product evolves. A change to a pricing configuration is versioned; existing quotation records retain the configuration and frozen version used to create them.</p>
+
+    <h2>Ending use</h2>
+    <p>You may stop using Scopequote at any time and request account deletion through the account flow. Access may be suspended when necessary to protect accounts, quotations, private links, or the service from misuse. These terms do not remove rights that cannot lawfully be waived.</p>
+
+    <h2>Questions and changes</h2>
+    <p>Questions about these terms or the service can be sent to <a href="mailto:{{ support_email|default:"support@scopequote.local" }}">{{ support_email|default:"support@scopequote.local" }}</a>. We may update these terms as the service evolves; the current version applies to each request while it is in use.</p>
+  </article>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Private links — Scopequote{% endblock %}
+{% block meta_description %}Create, copy, revoke, and inspect private Scopequote quotation links.{% endblock %}
+{% block body_class %}links-page{% endblock %}
+
+{% block content %}
+  <section class="page-intro" aria-labelledby="links-title">
+    <p><a href="{% url 'quotes:detail' pk=quote.pk %}">Back to quote</a></p>
+    <h1 id="links-title">Private links</h1>
+    <p class="lede">Each link points to one immutable quotation version. Keep active links private and revoke them when the conversation is complete.</p>
+  </section>
+
+  {% if version %}
+    <section class="page-section" aria-labelledby="link-management-title">
+      <div class="page-section__header">
+        <div>
+          <h2 id="link-management-title">{{ quote.quote_number }}</h2>
+        </div>
+        <form method="post" data-scopequote-pending>
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create">
+           <button class="button button--primary" type="submit"{% if not can_create %} disabled{% endif %}>Create private link</button>
+           <span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span>
+        </form>
+      </div>
+      {% if links %}
+        <ul class="quote-list">
+          {% for item in links %}
+            <li data-scopequote-actions>
+              <div class="quote-list__meta">
+                <span class="status-pill status-pill--muted">{{ item.state|title }}</span>
+                 {% if item.url %}<a class="private-link" href="{{ item.url }}">{{ item.url }}</a>{% else %}<span class="muted">Token cannot be recovered; reissue the link.</span>{% endif %}
+              </div>
+              <div class="actions-panel__row">
+                {% if item.url %}
+                  <button class="button button--small" type="button" data-scopequote-copy data-scopequote-copy-value="{{ item.url }}" hidden>Copy link</button>
+                  <button class="button button--small" type="button" data-scopequote-share data-scopequote-share-url="{{ item.url }}" data-scopequote-share-title="Scopequote quotation {{ quote.quote_number }}" hidden>Share link</button>
+                {% endif %}
+                <form method="post" data-scopequote-pending>
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="reissue">
+                  <input type="hidden" name="link_id" value="{{ item.link.pk }}">
+                   <button class="button button--small" type="submit">Reissue link</button>
+                   <span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span>
+                </form>
+                {% if not item.link.is_revoked %}
+                   <form method="post" data-scopequote-pending data-scopequote-confirm="Revoke this private link? Existing recipients will no longer be able to open it.">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="revoke">
+                    <input type="hidden" name="link_id" value="{{ item.link.pk }}">
+                     <button class="button button--small button--danger" type="submit">Revoke link</button>
+                     <span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span>
+                  </form>
+                {% endif %}
+              </div>
+              <span class="toast-status" data-scopequote-status aria-live="polite"></span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty-state">
+          <h3>No private links yet</h3>
+          <p>Create a link when the published version is ready to share with a client.</p>
+        </div>
+      {% endif %}
+    </section>
+  {% else %}
+    <div class="empty-state" role="status">
+      <h2>Publish this quote before creating a private link.</h2>
+      <p>A private link always points to a frozen commercial version.</p>
+      <a class="button button--primary" href="{% url 'quotes:publish' pk=quote.pk %}">Review and publish</a>
+    </div>
+  {% endif %}
+{% endblock %}

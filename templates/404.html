@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Page not found — Scopequote{% endblock %}
+
+{% block content %}
+  <section class="empty-state" aria-labelledby="error-404-title">
+    <h1 id="error-404-title">That page is not here.</h1>
+    <p>The address may have changed, or the record may no longer be available. Start with the estimator or return to your quotation desk.</p>
+    <div class="button-row">
+      <a class="button" href="{% url 'core:home' %}">Return home</a>
+      <a class="button button--primary" href="{% url 'quotes:estimator' %}">Estimate a project</a>
+    </div>
+  </section>
+{% endblock %}

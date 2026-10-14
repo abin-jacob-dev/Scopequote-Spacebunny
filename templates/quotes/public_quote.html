@@ -1,0 +1,156 @@
+{% load static %}
+{% load form_extras %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Private quotation — Scopequote</title>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <style nonce="{{ csp_nonce }}">
+      :root {
+        --scopequote-accent: {{ accent_color }};
+        --scopequote-accent-foreground: {{ accent_foreground }};
+      }
+    </style>
+  </head>
+  <body class="public-shell">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="public-header">
+      <a href="/">Scopequote</a>
+      <span class="public-header__label">Private quotation</span>
+    </header>
+    <main id="main-content" class="public-main">
+      <article class="public-document" aria-labelledby="quote-title">
+        <header>
+          {% if logo_url %}<img class="public-document__logo" src="{{ logo_url }}" alt="{{ sender_name }} logo">{% endif %}
+          <h1 id="quote-title">{{ project_title|default:"Quotation" }}</h1>
+          <p class="muted">Private quotation</p>
+          <p>Quote {{ quote_number }}</p>
+          <p class="status-pill status-pill--confidence public-document__accent" role="status">Status: {{ status_label }}</p>
+        </header>
+
+        {% if response_message %}
+          <div id="response-error-summary" class="{% if response_alert %}error-summary{% else %}response-status{% endif %}" role="{% if response_alert %}alert{% else %}status{% endif %}" aria-labelledby="response-error-title">
+            <h2 id="response-error-title" tabindex="-1" data-scopequote-focus-target="{% if response_alert %}true{% else %}false{% endif %}">{% if response_alert %}Review your response{% else %}Response status{% endif %}</h2>
+            <p>{{ response_message }}</p>
+            {% if response_alert and form.errors %}
+              <ul class="error-list">
+                 {% for field in form %}
+                   {% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}
+                 {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <section class="public-summary" aria-labelledby="summary-title">
+          <div>
+            <h2 id="summary-title">Quotation summary</h2>
+            <dl>
+              <dt>Prepared for</dt>
+              <dd>{{ client_label }}</dd>
+              <dt>From</dt>
+              <dd>{{ sender_name }}{% if sender_business_name %} · {{ sender_business_name }}{% endif %}</dd>
+              <dt>Issued</dt>
+              <dd>{{ issue_date|default:"Not specified" }}</dd>
+              <dt>Valid until</dt>
+              <dd>{{ valid_until|default:"Not specified" }}</dd>
+            </dl>
+          </div>
+          <div class="public-total">
+            <span class="metadata">Total</span>
+            <strong>{{ chosen_total }} {{ currency }}</strong>
+            {% if deposit_amount %}<p class="muted">Deposit {{ deposit_amount }} {{ currency }} ({{ deposit_percentage }}%)</p>{% endif %}
+          </div>
+        </section>
+
+        <section class="public-section public-details" aria-labelledby="scope-title">
+          <h2 id="scope-title">Scope</h2>
+          <p>{{ project_description|default:"No project overview has been added." }}</p>
+          <dl>
+            <dt>Category</dt>
+            <dd>{{ snapshot.project_category|default:"Not specified" }}</dd>
+            <dt>Delivery</dt>
+            <dd>{{ scope.delivery_days }} focused days</dd>
+            <dt>Revision rounds</dt>
+            <dd>{{ scope.revision_rounds }}</dd>
+            <dt>Complexity</dt>
+            <dd>{{ scope.complexity|default:"Not specified" }}</dd>
+            <dt>Urgency</dt>
+            <dd>{{ scope.urgency|default:"Not specified" }}</dd>
+            <dt>Experience</dt>
+            <dd>{{ scope.experience|default:"Not specified" }}</dd>
+            <dt>Estimated hours</dt>
+            <dd>{{ scope.effective_hours|default:"Not specified" }}</dd>
+            <dt>Timeline</dt>
+            <dd>{{ terms_details.timeline|default:"No timeline has been added." }}</dd>
+            <dt>Revision terms</dt>
+            <dd>{{ terms_details.revision_terms|default:"No revision terms have been added." }}</dd>
+          </dl>
+        </section>
+
+        <section class="public-section" aria-labelledby="investment-title">
+          <h2 id="investment-title">Investment</h2>
+          <div class="data-table-wrap">
+            <table>
+              <caption>Quotation line items</caption>
+              <thead>
+                <tr><th scope="col">Deliverable</th><th scope="col">Description</th><th scope="col">Amount</th></tr>
+              </thead>
+              <tbody>
+                {% for item in line_items %}
+                  <tr><td>{{ item.label }}</td><td>{{ item.description }}</td><td>{{ item.amount }} {{ currency }}</td></tr>
+                {% empty %}
+                  <tr><td colspan="3">No line items are listed.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="public-section" aria-labelledby="terms-title">
+          <h2 id="terms-title">Terms</h2>
+          <p>{{ terms|default:"No terms have been added." }}</p>
+          {% if terms_details.notes %}<h3>Notes</h3><p>{{ terms_details.notes }}</p>{% endif %}
+          {% if terms_details.exclusions %}<h3>Exclusions</h3><p>{{ terms_details.exclusions }}</p>{% endif %}
+          {% if terms_details.taxes %}<h3>Taxes</h3><p>{{ terms_details.taxes }}</p>{% endif %}
+          {% if terms_details.cancellation_terms %}<h3>Cancellation</h3><p>{{ terms_details.cancellation_terms }}</p>{% endif %}
+        </section>
+
+        <section class="public-response" aria-labelledby="response-title" data-scopequote-actions>
+          <h2 id="response-title">Your response</h2>
+          {% if response_available and not response_submitted %}
+             <form method="post" action="{{ response_path }}" novalidate data-scopequote-pending>
+              {% csrf_token %}
+              {{ form.idempotency_key }}
+              <fieldset class="radio-options">
+                <legend>Choose a response</legend>
+                 {% field form.action %}
+                 {% if form.action.errors %}<ul id="{{ form.action.id_for_label }}_error" class="field-errors" role="alert"><li>Choose a valid response.</li></ul>{% endif %}
+              </fieldset>
+              <div class="form-field">
+                <label for="{{ form.note.id_for_label }}">{{ form.note.label }}</label>
+                 {% field form.note %}
+                {% if form.note.help_text %}<p class="form-help">{{ form.note.help_text }}</p>{% endif %}
+                 {% if form.note.errors %}<ul id="{{ form.note.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.note.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+              </div>
+              <div class="button-row">
+                 <button class="button button--primary" type="submit">Send response</button>
+                 <span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span>
+                <span class="toast-status" data-scopequote-status aria-live="polite"></span>
+              </div>
+            </form>
+            <noscript><p class="muted">JavaScript is not required. Submit the form to send your response.</p></noscript>
+          {% elif response_submitted %}
+            <p class="alert alert-success" role="status">Your response has been recorded. This quotation cannot receive another response.</p>
+          {% else %}
+            <p class="alert alert-info" role="status">This quotation is no longer accepting a response.</p>
+          {% endif %}
+        </section>
+      </article>
+    </main>
+    <script src="{% static 'js/quote-actions.js' %}" defer></script>
+  </body>
+</html>

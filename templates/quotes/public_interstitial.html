@@ -1,0 +1,54 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Private quotation — Scopequote</title>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  </head>
+  <body class="public-shell">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="public-header">
+      <a href="/">Scopequote</a>
+      <span class="public-header__label">Private quotation</span>
+    </header>
+    <main id="main-content" class="public-main">
+      {% if unavailable %}
+        <section class="empty-state" aria-labelledby="unavailable-title">
+          <h1 id="unavailable-title">Quotation unavailable</h1>
+          <p class="muted">Private link</p>
+          <p role="status">{{ unavailable_message }}</p>
+        </section>
+      {% else %}
+        <article class="public-document" aria-labelledby="interstitial-title">
+          <header>
+            <h1 id="interstitial-title">Open secure quotation</h1>
+            <p class="muted">Private quotation</p>
+            <p class="lede">Continue to review the frozen quotation and choose whether to accept it or request changes.</p>
+          </header>
+          <div class="public-summary">
+            <dl>
+              <dt>From</dt>
+              <dd>{{ sender_name }}{% if sender_business_name %} · {{ sender_business_name }}{% endif %}</dd>
+              {% if sender_monogram %}<dt>Monogram</dt><dd>{{ sender_monogram }}</dd>{% endif %}
+              <dt>Quote</dt>
+              <dd>{{ quote_number }}</dd>
+              <dt>Prepared for</dt>
+              <dd>{{ client_label }}</dd>
+              <dt>Link expiry</dt>
+              <dd><time datetime="{{ expires_at|date:'c' }}">{{ expires_at|date:"j F Y" }}</time></dd>
+            </dl>
+          </div>
+           <form method="post" action="{{ open_path }}" novalidate data-scopequote-pending>
+            {% csrf_token %}
+             <button class="button button--primary" type="submit">Open secure quotation</button>
+             <span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span>
+          </form>
+        </article>
+      {% endif %}
+     </main>
+     <script src="{% static 'js/quote-actions.js' %}" defer></script>
+   </body>
+</html>

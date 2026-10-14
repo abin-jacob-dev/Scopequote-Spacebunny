@@ -1,0 +1,268 @@
+@page {
+  size: A4;
+  margin: 16mm 15mm 20mm;
+
+  @bottom-left {
+    content: "Scopequote quotation";
+    color: #6f6b64;
+    font: 8pt sans-serif;
+  }
+
+  @bottom-right {
+    content: "Page " counter(page) " of " counter(pages);
+    color: #6f6b64;
+    font: 8pt sans-serif;
+  }
+}
+
+@page :first {
+  margin-top: 14mm;
+}
+
+:root {
+  color: #20231f;
+  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  font-size: 10pt;
+  line-height: 1.45;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+p,
+li,
+dd,
+td,
+th,
+.long-value {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.document-header {
+  align-items: flex-start;
+  border-bottom: 2px solid #20231f;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  padding-bottom: 10mm;
+}
+
+.document-logo {
+  display: block;
+  max-height: 18mm;
+  max-width: 45mm;
+  object-fit: contain;
+}
+
+.brand-mark {
+  align-items: center;
+  background: #e85d3f;
+  color: #fffdf8;
+  display: flex;
+  font-family: serif;
+  font-size: 17pt;
+  font-weight: 700;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
+.brand-copy,
+.document-identity {
+  margin: 0;
+}
+
+.brand-copy p,
+.document-identity p {
+  margin: 0 0 2px;
+}
+
+.eyebrow,
+.document-label {
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sender-name {
+  font-family: serif;
+  font-size: 15pt;
+  font-weight: 700;
+}
+
+.document-identity {
+  text-align: right;
+}
+
+.document-label {
+  border: 1px solid #20231f;
+  display: inline-block;
+  margin-bottom: 4px;
+  padding: 3px 7px;
+}
+
+.document-label--accent {
+  background-color: var(--scopequote-accent);
+  color: var(--scopequote-accent-foreground);
+}
+
+.intro {
+  padding: 12mm 0 8mm;
+}
+
+.intro h1 {
+  font-family: serif;
+  font-size: 28pt;
+  line-height: 1.08;
+  margin: 2mm 0 4mm;
+}
+
+.intro p {
+  margin: 1mm 0;
+}
+
+.client-name {
+  font-size: 12pt;
+  font-weight: 700;
+}
+
+.commercial-summary {
+  background: #f2eadf;
+  border-top: 1px solid #20231f;
+  display: grid;
+  gap: 8mm;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 7mm;
+}
+
+.commercial-summary p {
+  margin: 0;
+}
+
+.amount {
+  font-family: serif;
+  font-size: 22pt;
+  font-weight: 700;
+}
+
+.secondary-amount {
+  font-family: serif;
+  font-size: 15pt;
+  font-weight: 700;
+}
+
+.supporting {
+  color: #6f6b64;
+  font-size: 8pt;
+}
+
+.document-section {
+  margin-top: 10mm;
+}
+
+.document-section h2 {
+  border-bottom: 1px solid #20231f;
+  font-family: serif;
+  font-size: 17pt;
+  margin: 0 0 5mm;
+  padding-bottom: 2mm;
+  break-after: avoid;
+}
+
+.document-section h3 {
+  font-size: 10pt;
+  margin: 5mm 0 1mm;
+  break-after: avoid;
+}
+
+.prose {
+  white-space: normal;
+}
+
+.scope-grid {
+  display: grid;
+  gap: 4mm 7mm;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.scope-grid div {
+  border-left: 2px solid #ded4c6;
+  padding-left: 3mm;
+}
+
+.scope-grid dt {
+  color: #6f6b64;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.scope-grid dd {
+  margin: 1mm 0 0;
+}
+
+.term-block {
+  margin-top: 5mm;
+}
+
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+caption {
+  caption-side: top;
+}
+
+th,
+td {
+  border-bottom: 1px solid #ded4c6;
+  padding: 3mm;
+  text-align: left;
+  vertical-align: top;
+}
+
+thead {
+  display: table-header-group;
+}
+
+tfoot {
+  display: table-row-group;
+}
+
+th:first-child,
+td:first-child {
+  width: 26%;
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+  width: 54%;
+}
+
+.amount-cell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+tfoot th,
+tfoot td {
+  border-bottom: 0;
+  border-top: 2px solid #20231f;
+  font-weight: 700;
+}
+
+tr {
+  break-inside: avoid;
+}

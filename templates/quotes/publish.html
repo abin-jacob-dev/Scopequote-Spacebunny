@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load form_extras %}
+
+{% block title %}Publish quote — Scopequote{% endblock %}
+{% block meta_description %}Review and freeze a Scopequote quotation as an immutable version.{% endblock %}
+{% block body_class %}publish-page{% endblock %}
+
+{% block content %}
+  <section class="page-intro" aria-labelledby="publish-title">
+    <p><a href="{% url 'quotes:detail' pk=quote.pk %}">Back to quote</a></p>
+    <h1 id="publish-title">Review and publish</h1>
+    <p class="lede">Publishing freezes the commercial terms into version 1 and locks this draft. Later revisions start with duplication.</p>
+  </section>
+
+  {% if not request.user.is_email_verified %}
+    <div class="alert alert-warning" role="alert">Verify your email before publishing a private client link. <a href="{% url 'accounts:verify-notice' %}">Review verification</a>.</div>
+  {% endif %}
+
+  {% if conflict %}
+    <div class="error-summary" role="alert" aria-labelledby="publish-conflict-title">
+      <h2 id="publish-conflict-title" tabindex="-1" data-scopequote-focus-target="true">Review before publishing</h2>
+      <p>This quote changed in another tab. Review the current values and submit again.</p>
+    </div>
+    {% if current_form %}
+      <section class="conflict-state" aria-labelledby="publish-current-title">
+        <h3 id="publish-current-title">Current saved values</h3>
+        <p>Project title: {{ current_form.project_title.value|default:"Not set" }}</p>
+        <p>Client: {{ current_form.client_name.value|default:"Not set" }}</p>
+        <p>Validity: {{ current_form.issue_date.value|default:"Not set" }} to {{ current_form.valid_until.value|default:"Not set" }}</p>
+      </section>
+    {% endif %}
+  {% endif %}
+
+  {% if form.errors %}
+    <div class="error-summary" role="alert" aria-labelledby="publish-errors-title">
+      <h2 id="publish-errors-title" tabindex="-1" data-scopequote-focus-target="true">Resolve the publication errors</h2>
+      <ul class="error-list">
+        {% if form.non_field_errors %}{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}{% endif %}
+        {% for field in form %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="split-layout">
+    <section class="form-shell" aria-labelledby="publish-form-title">
+      <h2 id="publish-form-title">Required publication details</h2>
+       <form method="post" enctype="multipart/form-data" novalidate data-scopequote-pending>
+        {% csrf_token %}
+         {% field form.updated_at %}
+
+        {% for field in form %}
+          {% if field.name != "updated_at" and field.name != "intentional_adjustment_confirmed" and field.name != "confirm_intentional_adjustment" and field.name != "confirm_adjustment" and field.name != "intentional_adjustment" %}
+            <div class="form-field">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+               {% field field %}
+              {% if field.help_text %}<p class="form-help">{{ field.help_text }}</p>{% endif %}
+               {% if field.errors %}<ul id="{{ field.id_for_label }}_error" class="field-errors" role="alert">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+        <div class="field">
+          <label class="radio-option" for="{{ form.intentional_adjustment_confirmed.id_for_label }}">
+             {% field form.intentional_adjustment_confirmed %}
+            <span>{{ form.intentional_adjustment_confirmed.label }}</span>
+          </label>
+           {% if form.intentional_adjustment_confirmed.errors %}<ul id="{{ form.intentional_adjustment_confirmed.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.intentional_adjustment_confirmed.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+        <input type="hidden" name="confirm_intentional_adjustment" value="{{ form.confirm_intentional_adjustment.value|default_if_none:'0' }}">
+        <div class="button-row">
+           <button class="button button--primary" type="submit"{% if not request.user.is_email_verified %} disabled{% endif %}>Publish immutable quotation</button>
+           <span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span>
+        </div>
+      </form>
+    </section>
+
+    <section class="quote-preview" aria-labelledby="review-title">
+      <h2 id="review-title">What clients will see</h2>
+      <dl>
+        <dt>Project</dt><dd>{{ quote.project_title|default:"Untitled project" }}</dd>
+        <dt>Client</dt><dd>{{ quote.client_name|default:"Not set" }}</dd>
+        <dt>Total</dt><dd>{{ quote.chosen_total }} {{ quote.currency }}</dd>
+        <dt>Deposit</dt><dd>{{ quote.deposit_amount }} {{ quote.currency }}</dd>
+        <dt>Line items</dt><dd>{{ quote.line_items.count }}</dd>
+      </dl>
+      <p class="muted">Publishing creates the immutable record used by the private link and PDF.</p>
+    </section>
+  </div>
+{% endblock %}

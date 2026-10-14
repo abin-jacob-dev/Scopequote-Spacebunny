@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:?POSTGRES_DB must be set}"
+      POSTGRES_USER: "${POSTGRES_USER:?POSTGRES_USER must be set}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SCOPEQUOTE_ENV: "${SCOPEQUOTE_ENV:?SCOPEQUOTE_ENV must be set}"
+      DEBUG: "${DEBUG:?DEBUG must be set}"
+      SECRET_KEY: "${SECRET_KEY:?SECRET_KEY must be set}"
+      ALLOWED_HOSTS: "${ALLOWED_HOSTS:?ALLOWED_HOSTS must be set}"
+      CSRF_TRUSTED_ORIGINS: "${CSRF_TRUSTED_ORIGINS:?CSRF_TRUSTED_ORIGINS must be set}"
+      POSTGRES_DB: "${POSTGRES_DB:?POSTGRES_DB must be set}"
+      POSTGRES_USER: "${POSTGRES_USER:?POSTGRES_USER must be set}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}"
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      MEDIA_ROOT: /app/media
+      STATIC_ROOT: /app/staticfiles
+      EMAIL_BACKEND: "${EMAIL_BACKEND:?EMAIL_BACKEND must be set}"
+      EMAIL_HOST: "${EMAIL_HOST:?EMAIL_HOST must be set}"
+      EMAIL_PORT: "${EMAIL_PORT:?EMAIL_PORT must be set}"
+      EMAIL_HOST_USER: "${EMAIL_HOST_USER:-}"
+      EMAIL_HOST_PASSWORD: "${EMAIL_HOST_PASSWORD:-}"
+      EMAIL_USE_TLS: "${EMAIL_USE_TLS:?EMAIL_USE_TLS must be set}"
+      EMAIL_USE_SSL: "${EMAIL_USE_SSL:?EMAIL_USE_SSL must be set}"
+      EMAIL_SENDER_VERIFIED: "${EMAIL_SENDER_VERIFIED:?EMAIL_SENDER_VERIFIED must be set}"
+      DEFAULT_FROM_EMAIL: "${DEFAULT_FROM_EMAIL:?DEFAULT_FROM_EMAIL must be set}"
+      SERVER_EMAIL: "${SERVER_EMAIL:?SERVER_EMAIL must be set}"
+      SHARE_TOKEN_ENCRYPTION_KEY: "${SHARE_TOKEN_ENCRYPTION_KEY:?SHARE_TOKEN_ENCRYPTION_KEY must be set}"
+      SHARE_TOKEN_ENCRYPTION_KEY_VERSION: "${SHARE_TOKEN_ENCRYPTION_KEY_VERSION:-v1}"
+      SESSION_COOKIE_SECURE: "${SESSION_COOKIE_SECURE:?SESSION_COOKIE_SECURE must be set}"
+      SESSION_COOKIE_HTTPONLY: "${SESSION_COOKIE_HTTPONLY:?SESSION_COOKIE_HTTPONLY must be set}"
+      CSRF_COOKIE_SECURE: "${CSRF_COOKIE_SECURE:?CSRF_COOKIE_SECURE must be set}"
+      CSRF_COOKIE_HTTPONLY: "${CSRF_COOKIE_HTTPONLY:?CSRF_COOKIE_HTTPONLY must be set}"
+      SESSION_COOKIE_SAMESITE: "${SESSION_COOKIE_SAMESITE:?SESSION_COOKIE_SAMESITE must be set}"
+      TRUST_PROXY_HEADERS: "${TRUST_PROXY_HEADERS:?TRUST_PROXY_HEADERS must be set}"
+      TRUSTED_PROXY_IPS: "${TRUSTED_PROXY_IPS:-}"
+      SECURE_PROXY_SSL_HEADER: "${SECURE_PROXY_SSL_HEADER:-}"
+      SECURE_SSL_REDIRECT: "${SECURE_SSL_REDIRECT:?SECURE_SSL_REDIRECT must be set}"
+      SECURE_HSTS_SECONDS: "${SECURE_HSTS_SECONDS:?SECURE_HSTS_SECONDS must be set}"
+      SECURE_HSTS_INCLUDE_SUBDOMAINS: "${SECURE_HSTS_INCLUDE_SUBDOMAINS:?SECURE_HSTS_INCLUDE_SUBDOMAINS must be set}"
+      SECURE_HSTS_PRELOAD: "${SECURE_HSTS_PRELOAD:?SECURE_HSTS_PRELOAD must be set}"
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - media-data:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+  media-data:

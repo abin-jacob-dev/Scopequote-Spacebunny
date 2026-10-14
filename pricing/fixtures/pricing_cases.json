@@ -1,0 +1,424 @@
+{
+  "pricing_config_version": "pricing-v1",
+  "cases": [
+    {
+      "id": "usd-standard-baseline",
+      "input": {
+        "description": "A clear product design project with a defined handoff.",
+        "delivery_days": 5,
+        "complexity": "standard",
+        "revision_rounds": 0,
+        "urgency": "standard",
+        "experience": "intermediate",
+        "currency": "USD"
+      },
+      "expected": {
+        "effective_hours": "20.00",
+        "minimum": "1160",
+        "recommended": "1320",
+        "maximum": "1480",
+        "hourly_equivalent": "66"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "usd-straightforward-priority",
+      "input": {
+        "description": "A small website refresh with a focused set of pages and clear acceptance criteria.",
+        "delivery_days": 1,
+        "complexity": "straightforward",
+        "revision_rounds": 0,
+        "urgency": "priority",
+        "experience": "developing",
+        "currency": "USD"
+      },
+      "expected": {
+        "effective_hours": "3.60",
+        "minimum": "135",
+        "recommended": "155",
+        "maximum": "175",
+        "hourly_equivalent": "43"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "eur-standard-rush",
+      "input": {
+        "description": "A responsive web application that needs implementation, testing, and a documented handoff.",
+        "delivery_days": 3,
+        "complexity": "standard",
+        "revision_rounds": 1,
+        "urgency": "rush",
+        "experience": "intermediate",
+        "currency": "EUR"
+      },
+      "expected": {
+        "effective_hours": "12.00",
+        "minimum": "860",
+        "recommended": "980",
+        "maximum": "1100",
+        "hourly_equivalent": "82"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "gbp-complex-priority",
+      "input": {
+        "description": "A complex web platform with several workflows, integrations, and a thorough release checklist.",
+        "delivery_days": 10,
+        "complexity": "complex",
+        "revision_rounds": 3,
+        "urgency": "priority",
+        "experience": "experienced",
+        "currency": "GBP"
+      },
+      "expected": {
+        "effective_hours": "55.50",
+        "minimum": "4970",
+        "recommended": "5650",
+        "maximum": "6325",
+        "hourly_equivalent": "102"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "usd-advanced-rush",
+      "input": {
+        "description": "An advanced digital product requiring architecture, implementation, review, and launch support.",
+        "delivery_days": 20,
+        "complexity": "advanced",
+        "revision_rounds": 10,
+        "urgency": "rush",
+        "experience": "specialist",
+        "currency": "USD"
+      },
+      "expected": {
+        "effective_hours": "156.00",
+        "minimum": "27800",
+        "recommended": "31590",
+        "maximum": "35380",
+        "hourly_equivalent": "203"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "usd-revision-zero",
+      "input": {
+        "description": "A standard project with two included revision rounds and a concise delivery plan.",
+        "delivery_days": 5,
+        "complexity": "standard",
+        "revision_rounds": 0,
+        "urgency": "standard",
+        "experience": "intermediate",
+        "currency": "USD"
+      },
+      "expected": {
+        "effective_hours": "20.00",
+        "minimum": "1160",
+        "recommended": "1320",
+        "maximum": "1480",
+        "hourly_equivalent": "66"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "usd-revision-three",
+      "input": {
+        "description": "A standard project with three revision rounds and a clear review schedule.",
+        "delivery_days": 5,
+        "complexity": "standard",
+        "revision_rounds": 3,
+        "urgency": "standard",
+        "experience": "intermediate",
+        "currency": "USD"
+      },
+      "expected": {
+        "effective_hours": "21.50",
+        "minimum": "1250",
+        "recommended": "1420",
+        "maximum": "1590",
+        "hourly_equivalent": "66"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "usd-revision-ten",
+      "input": {
+        "description": "A standard project with the maximum supported revision rounds and documented review checkpoints.",
+        "delivery_days": 5,
+        "complexity": "standard",
+        "revision_rounds": 10,
+        "urgency": "standard",
+        "experience": "intermediate",
+        "currency": "USD"
+      },
+      "expected": {
+        "effective_hours": "32.00",
+        "minimum": "1860",
+        "recommended": "2110",
+        "maximum": "2365",
+        "hourly_equivalent": "66"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "usd-duration-one",
+      "input": {
+        "description": "A short standard engagement with one focused delivery day and a documented outcome.",
+        "delivery_days": 1,
+        "complexity": "standard",
+        "revision_rounds": 0,
+        "urgency": "standard",
+        "experience": "intermediate",
+        "currency": "USD"
+      },
+      "expected": {
+        "effective_hours": "4.00",
+        "minimum": "230",
+        "recommended": "265",
+        "maximum": "295",
+        "hourly_equivalent": "66"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "usd-duration-sixty",
+      "input": {
+        "description": "A long standard engagement with sixty focused delivery days and milestone reviews.",
+        "delivery_days": 60,
+        "complexity": "standard",
+        "revision_rounds": 0,
+        "urgency": "standard",
+        "experience": "intermediate",
+        "currency": "USD"
+      },
+      "expected": {
+        "effective_hours": "240.00",
+        "minimum": "13940",
+        "recommended": "15840",
+        "maximum": "17740",
+        "hourly_equivalent": "66"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "usd-fee-half-boundary",
+      "input": {
+        "description": "A specialist estimate selected to land on a half-unit fee boundary.",
+        "delivery_days": 1,
+        "complexity": "straightforward",
+        "revision_rounds": 0,
+        "urgency": "standard",
+        "experience": "specialist",
+        "currency": "USD"
+      },
+      "expected": {
+        "effective_hours": "3.60",
+        "minimum": "415",
+        "recommended": "475",
+        "maximum": "530",
+        "hourly_equivalent": "131"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "usd-hourly-half-boundary",
+      "input": {
+        "description": "A developing estimate selected to land on a half-unit hourly boundary.",
+        "delivery_days": 1,
+        "complexity": "standard",
+        "revision_rounds": 0,
+        "urgency": "standard",
+        "experience": "developing",
+        "currency": "USD"
+      },
+      "expected": {
+        "effective_hours": "4.00",
+        "minimum": "135",
+        "recommended": "155",
+        "maximum": "170",
+        "hourly_equivalent": "39"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "usd-rush-fee-half-boundary",
+      "input": {
+        "description": "A specialist rush estimate selected to exercise fee and hourly rounding together.",
+        "delivery_days": 1,
+        "complexity": "standard",
+        "revision_rounds": 0,
+        "urgency": "rush",
+        "experience": "specialist",
+        "currency": "USD"
+      },
+      "expected": {
+        "effective_hours": "4.00",
+        "minimum": "655",
+        "recommended": "745",
+        "maximum": "830",
+        "hourly_equivalent": "186"
+      },
+      "factor_ids": [
+        "effective_hours",
+        "complexity_multiplier",
+        "experience_rate",
+        "revision_time",
+        "risk_buffer",
+        "urgency_multiplier",
+        "minimum",
+        "recommended",
+        "maximum",
+        "hourly_equivalent"
+      ]
+    },
+    {
+      "id": "zero-hour-boundary",
+      "input": {
+        "description": "A zero-duration boundary case that must be rejected by the server.",
+        "delivery_days": 0,
+        "complexity": "standard",
+        "revision_rounds": 0,
+        "urgency": "standard",
+        "experience": "intermediate",
+        "currency": "USD"
+      },
+      "expected": {
+        "error": "effective_hours must be positive"
+      },
+      "factor_ids": []
+    }
+  ]
+}

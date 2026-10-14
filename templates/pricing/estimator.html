@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% load form_extras %}
+
+{% block title %}Project estimator — Scopequote{% endblock %}
+{% block meta_description %}Build an explainable price range from project scope, delivery, revisions, urgency, and experience.{% endblock %}
+{% block body_class %}estimator-page{% endblock %}
+
+{% block content %}
+  <section class="page-intro" aria-labelledby="estimator-title">
+    <h1 id="estimator-title">Make the estimate explain itself.</h1>
+    <p class="lede">Enter the work and its delivery context. Scopequote calculates a server-verified range, then shows the factors behind it.</p>
+  </section>
+
+  <noscript>
+    <div class="alert alert-info" role="status">JavaScript is optional. Complete the form and select “Calculate estimate” to receive the same server result.</div>
+  </noscript>
+
+  {% if status_message %}
+    <p class="alert alert-info" role="status">{{ status_message }}</p>
+  {% endif %}
+
+  <div class="split-layout">
+    <section class="form-shell" aria-labelledby="estimator-form-title">
+      <h2 id="estimator-form-title" class="sr-only">Estimate details</h2>
+      <form
+        method="post"
+        action="{% url 'quotes:estimator' %}"
+        data-scopequote-pricing
+        data-scopequote-pending
+        data-scopequote-has-server-result="{% if result %}true{% else %}false{% endif %}"
+        data-scopequote-pricing-version="{{ pricing_config.version }}"
+        data-scopequote-hours-per-delivery-day="{{ pricing_config.hours_per_delivery_day }}"
+        data-scopequote-included-revision-rounds="{{ pricing_config.included_revision_rounds }}"
+        data-scopequote-additional-revision-hours="{{ pricing_config.additional_revision_hours }}"
+        data-scopequote-minimum-multiplier="{{ pricing_config.minimum_multiplier }}"
+        data-scopequote-maximum-multiplier="{{ pricing_config.maximum_multiplier }}"
+        data-scopequote-fee-quantum="{{ pricing_config.fee_quantum }}"
+        data-scopequote-hourly-equivalent-quantum="{{ pricing_config.hourly_equivalent_quantum }}"
+        data-pricing-version="{{ pricing_config.version }}"
+        data-hours-per-delivery-day="{{ pricing_config.hours_per_delivery_day }}"
+        data-included-revision-rounds="{{ pricing_config.included_revision_rounds }}"
+        data-additional-revision-hours="{{ pricing_config.additional_revision_hours }}"
+        data-minimum-multiplier="{{ pricing_config.minimum_multiplier }}"
+        data-maximum-multiplier="{{ pricing_config.maximum_multiplier }}"
+        data-fee-quantum="{{ pricing_config.fee_quantum }}"
+        data-hourly-equivalent-quantum="{{ pricing_config.hourly_equivalent_quantum }}"
+      >
+        {% csrf_token %}
+
+        {% if form.errors %}
+          <div class="error-summary" id="estimator-error-summary" role="alert" aria-labelledby="estimator-error-title">
+            <h2 id="estimator-error-title" tabindex="-1" data-scopequote-focus-target="true">There are errors to fix</h2>
+            <p>Review the highlighted fields before calculating the estimate.</p>
+            <ul class="error-list">
+              {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+              {% endif %}
+              {% for field in form %}
+                {% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <div hidden aria-hidden="true">
+          {% for factor in pricing_config.complexity_factors %}
+            <span data-scopequote-complexity-factor="{{ factor.key }}:{{ factor.effort }}:{{ factor.risk }}" data-complexity-factor="{{ factor.key }}:{{ factor.effort }}:{{ factor.risk }}"></span>
+          {% endfor %}
+          {% for factor in pricing_config.urgency_factors %}
+            <span data-scopequote-urgency-factor="{{ factor.key }}:{{ factor.value }}" data-urgency-factor="{{ factor.key }}:{{ factor.value }}"></span>
+          {% endfor %}
+          {% for factor in pricing_config.rate_factors %}
+            <span data-scopequote-rate-factor="{{ factor.experience }}:{{ factor.currency }}={{ factor.value }}" data-rate-factor="{{ factor.experience }}:{{ factor.currency }}={{ factor.value }}"></span>
+          {% endfor %}
+        </div>
+
+        <div class="form-grid">
+          <fieldset>
+            <legend>Project</legend>
+            <div class="form-field">
+              <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+              {% field form.description %}
+              <p class="form-help">{{ form.description.help_text }}</p>
+              {% if form.description.errors %}
+                 <ul id="{{ form.description.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.description.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+              {% endif %}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Delivery</legend>
+            <div class="form-field">
+              <span class="field-label" id="duration-presets-label">Duration presets</span>
+              <div class="duration-presets" role="group" aria-labelledby="duration-presets-label">
+                {% for days, label in duration_presets.items %}
+                  <button type="button" data-scopequote-duration-preset="{{ days }}" data-delivery-days="{{ days }}">{{ label }}</button>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="{{ form.delivery_days.id_for_label }}">{{ form.delivery_days.label }}</label>
+              {% field form.delivery_days %}
+              <p class="form-help">{{ form.delivery_days.help_text }}</p>
+              {% if form.delivery_days.errors %}
+                 <ul id="{{ form.delivery_days.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.delivery_days.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+              {% endif %}
+            </div>
+            <div class="form-field">
+              <label for="{{ form.revision_rounds.id_for_label }}">{{ form.revision_rounds.label }}</label>
+              {% field form.revision_rounds %}
+              <p class="form-help">{{ form.revision_rounds.help_text }}</p>
+              {% if form.revision_rounds.errors %}
+                 <ul id="{{ form.revision_rounds.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.revision_rounds.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+              {% endif %}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Pricing Context</legend>
+            <div class="form-field">
+              <label for="{{ form.complexity.id_for_label }}">{{ form.complexity.label }}</label>
+              {% field form.complexity %}
+              {% if form.complexity.errors %}
+                 <ul id="{{ form.complexity.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.complexity.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+              {% endif %}
+            </div>
+            <div class="form-field">
+              <label for="{{ form.urgency.id_for_label }}">{{ form.urgency.label }}</label>
+              {% field form.urgency %}
+              {% if form.urgency.errors %}
+                 <ul id="{{ form.urgency.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.urgency.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+              {% endif %}
+            </div>
+            <div class="form-field">
+              <label for="{{ form.experience.id_for_label }}">{{ form.experience.label }}</label>
+              {% field form.experience %}
+              {% if form.experience.errors %}
+                 <ul id="{{ form.experience.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.experience.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+              {% endif %}
+            </div>
+            <div class="form-field">
+              <label for="{{ form.currency.id_for_label }}">{{ form.currency.label }}</label>
+              {% field form.currency %}
+              {% if form.currency.errors %}
+                 <ul id="{{ form.currency.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.currency.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+              {% endif %}
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="button-row">
+          <button class="button button--primary" type="submit">Calculate estimate</button>
+          <span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span>
+        </div>
+      </form>
+    </section>
+
+    <aside class="estimate-panel" data-scopequote-preview data-scopequote-preview-state="{% if result %}server{% else %}idle{% endif %}" aria-labelledby="estimate-preview-title">
+      <button class="mobile-summary-toggle" type="button" data-scopequote-summary-toggle aria-expanded="true" aria-controls="estimate-preview-body" hidden>Hide estimate summary</button>
+      <details class="estimate-summary" open>
+        <summary>Server-verified estimate</summary>
+        <div class="estimate-summary__body" id="estimate-preview-body">
+          <h2 id="estimate-preview-title">Your working range</h2>
+           <p class="estimate-panel__status" data-scopequote-preview-status data-state="{% if result %}ready{% else %}idle{% endif %}" role="status">{% if result %}Calculated on the server.{% else %}Complete the form to calculate a server-verified result.{% endif %}</p>
+           <p class="estimate-panel__status" data-scopequote-stale-status role="status" aria-live="polite" hidden>Inputs changed. Submit to refresh the server result.</p>
+          <dl class="estimate-values">
+            <div class="estimate-value">
+              <dt class="estimate-value__label">Minimum</dt>
+              <dd class="estimate-value__number" data-scopequote-preview-value="minimum">{% if result %}{{ result.result.minimum }}{% else %}—{% endif %}</dd>
+            </div>
+            <div class="estimate-value estimate-value--recommended">
+              <dt class="estimate-value__label">Recommended</dt>
+              <dd class="estimate-value__number" data-scopequote-preview-value="recommended">{% if result %}{{ result.result.recommended }}{% else %}—{% endif %}</dd>
+            </div>
+            <div class="estimate-value">
+              <dt class="estimate-value__label">Maximum</dt>
+              <dd class="estimate-value__number" data-scopequote-preview-value="maximum">{% if result %}{{ result.result.maximum }}{% else %}—{% endif %}</dd>
+            </div>
+            <div class="estimate-value">
+              <dt class="estimate-value__label">Hourly equivalent</dt>
+              <dd class="estimate-value__number" data-scopequote-preview-value="hourly_equivalent">{% if result %}{{ result.result.hourly_equivalent }}{% else %}—{% endif %}</dd>
+            </div>
+          </dl>
+          <p class="metadata">Currency: <span data-scopequote-preview-value="currency">{% if result %}{{ result.inputs.currency }}{% else %}—{% endif %}</span></p>
+        </div>
+      </details>
+      <p class="muted">The live preview is a convenience. Django recalculates and validates the authoritative result after submit.</p>
+    </aside>
+  </div>
+
+  {% if result %}
+    <section class="page-section" data-scopequote-result-region aria-labelledby="estimate-detail-title">
+      <div class="page-section__header">
+        <div>
+          <h2 id="estimate-detail-title">What is shaping the number?</h2>
+        </div>
+        <p class="muted">Configuration {{ result.result.pricing_config_version }}</p>
+      </div>
+      <div class="section-grid">
+         <div class="data-table-wrap" data-scopequote-factor-ledger>
+           <table>
+            <caption>Calculation factors</caption>
+            <thead>
+              <tr><th scope="col">Factor</th><th scope="col">Value</th></tr>
+            </thead>
+            <tbody>
+              {% for factor in result.result.factors %}
+                <tr><td>{{ factor.label }}</td><td>{{ factor.value }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+         <div class="suggested-scope" data-scopequote-scope-suggestions>
+          <h3>Suggested scope</h3>
+          <p>Detected category: <strong>{{ result.scope.category|title }}</strong></p>
+          <p>Confidence: <strong>{{ result.scope.confidence|title }}</strong></p>
+          <ul class="prose-list">
+            {% for item in result.scope.suggested_items %}<li><span>{{ item }}</span></li>{% endfor %}
+          </ul>
+          <p class="muted">Confirm or rewrite every item before sending a quotation.</p>
+        </div>
+      </div>
+    </section>
+
+     <section class="page-section" data-scopequote-guest-actions aria-labelledby="estimate-next-title">
+      <div class="callout">
+         <h2 id="estimate-next-title">Keep this range in the conversation.</h2>
+         <p>Save a session-backed guest quotation to download a PDF, or sign in later to keep private quote history and shareable versions.</p>
+         {% if request.user.is_authenticated %}
+           <a class="button button--primary" href="{% url 'quotes:new' %}">Save quote</a>
+         {% endif %}
+
+        {% if guest_quote %}
+          <p class="alert alert-success" role="status">Guest quotation draft created. It is ready for PDF rendering.</p>
+           <a class="button button--primary" data-scopequote-downstream-action href="{% url 'quotes:guest_pdf' %}">Download guest PDF</a>
+        {% elif conversion_nonce %}
+           <form method="post" action="{% url 'quotes:guest_quote' %}" data-scopequote-actions data-scopequote-pending data-scopequote-downstream-action>
+            {% csrf_token %}
+            <input type="hidden" name="nonce" value="{{ conversion_nonce }}">
+            <button class="button button--primary" type="submit">Create guest quotation</button>
+             <span class="toast-status" data-scopequote-status aria-live="polite"></span>
+             <span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span>
+          </form>
+        {% else %}
+          <div class="button-row">
+            <a class="button button--primary" href="{% url 'accounts:signup' %}">Create an account</a>
+            <a class="button" href="{% url 'accounts:login' %}">Sign in</a>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

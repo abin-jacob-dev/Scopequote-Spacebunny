@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Scopequote — Project pricing with clarity{% endblock %}
+{% block meta_description %}Turn project context into an explainable price range and a confident quotation starting point.{% endblock %}
+
+{% block content %}
+  <section class="hero" aria-labelledby="home-title">
+    <div>
+      <h1 id="home-title">Price unfamiliar projects with clarity.</h1>
+      <p class="lede">Scopequote turns project context into an explainable range, a recommended fee, and a quotation you can stand behind.</p>
+      <div class="button-row">
+        <a href="{% url 'quotes:estimator' %}">Estimate your project</a>
+        <a class="button" href="#method">See how it works</a>
+      </div>
+    </div>
+    <aside class="hero__aside" aria-labelledby="home-aside-title">
+      <h2 id="home-aside-title">A number you can explain.</h2>
+      <p>Delivery, complexity, revisions, urgency, and experience stay visible beside the result. The guidance is yours to accept, adjust, or question.</p>
+      <a href="{% url 'quotes:estimator' %}">Start with the essentials</a>
+    </aside>
+  </section>
+
+  <section class="page-section" aria-labelledby="sample-title">
+    <div class="page-section__header">
+      <div>
+        <h2 id="sample-title">See the reasoning before the decision.</h2>
+      </div>
+      <p class="muted">Illustrative figures use the versioned reference model.</p>
+    </div>
+    <div class="sample-ledger">
+      <div class="sample-ledger__amount">$1,320 <span>recommended USD</span></div>
+      <dl>
+        <dt>Estimated range</dt>
+        <dd>$1,160–$1,480</dd>
+        <dt>Hourly equivalent</dt>
+        <dd>$66</dd>
+        <dt>Configuration</dt>
+        <dd>pricing-v1</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section id="method" class="page-section" aria-labelledby="method-title">
+    <div class="split-layout">
+      <div>
+        <h2 id="method-title">The estimate is a starting point, not a black box.</h2>
+        <p class="lede">Scopequote makes the assumptions visible so you can decide whether the work, pace, and risk deserve the number.</p>
+      </div>
+      <div class="card card--quiet">
+        <ul class="prose-list">
+          <li><span>Describe the outcome and the work that makes it real.</span></li>
+          <li><span>Set focused delivery days and a realistic revision round.</span></li>
+          <li><span>Review the factor ledger before turning guidance into a quote.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-section" aria-labelledby="outcome-title">
+    <div class="section-grid">
+      <div>
+        <h2 id="outcome-title">Keep the commercial conversation in view.</h2>
+        <p>Save a private quotation history when you are ready. Edit scope, schedule, terms, and line items without losing the estimate that started the conversation.</p>
+      </div>
+      <div class="callout">
+        <h3>Suggested scope stays editable.</h3>
+        <p>Project keywords can suggest a starting outline. They never silently change the price, and every item remains yours to rewrite.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-section" aria-labelledby="trust-title">
+    <div class="split-layout">
+      <div>
+        <h2 id="trust-title">A calm place for sensitive client details.</h2>
+        <p>Private links are version-specific, expiring, and revocable. Owner history is scoped to the signed-in account, and published versions remain immutable records.</p>
+      </div>
+      <div class="callout callout--coral">
+        <h3>Your judgment stays in charge.</h3>
+        <p>Scopequote offers guidance from code-owned reference rates. It is not live market data, a guarantee of acceptance, or a substitute for your judgment.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-section" aria-labelledby="next-title">
+    <div class="callout">
+      <h2 id="next-title">Ready to make the range legible?</h2>
+      <p>Start with a short project description. You can leave the account step for later.</p>
+      <a class="button button--primary" href="{% url 'quotes:estimator' %}">Estimate your project</a>
+    </div>
+  </section>
+{% endblock %}

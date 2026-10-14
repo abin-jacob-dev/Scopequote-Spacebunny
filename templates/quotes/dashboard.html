@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Scopequote{% endblock %}
+{% block meta_description %}Review saved Scopequote quotations and client response status.{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block content %}
+  <section class="page-intro" aria-labelledby="dashboard-title">
+    <h1 id="dashboard-title">Your work, in the open.</h1>
+    <p class="lede">Track drafts, sent quotations, and client responses from one calm view.</p>
+  </section>
+
+  {% if not can_publish %}
+    <div class="alert alert-info" role="status">Verify your email before publishing a private client link. <a href="{% url 'accounts:verify-notice' %}">Review verification</a>.</div>
+  {% endif %}
+
+  <section class="page-section" aria-labelledby="glance-title">
+    <div class="page-section__header">
+      <div>
+        <h2 id="glance-title">{{ quote_count }} saved quote{{ quote_count|pluralize }}</h2>
+      </div>
+      <a class="button button--primary" href="{% url 'quotes:estimator' %}">Estimate a project</a>
+    </div>
+    <div class="data-table-wrap">
+      <table>
+        <caption>Quotation status summary</caption>
+        <thead>
+          <tr><th scope="col">Status</th><th scope="col">Count</th></tr>
+        </thead>
+        <tbody>
+          {% for status in status_summary %}
+            <tr>
+              <td><span class="status-pill status-pill--muted">{{ status.label }}</span></td>
+              <td>{{ status.count }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="page-section" aria-labelledby="recent-title">
+    <div class="page-section__header">
+      <div>
+        <h2 id="recent-title">Recent quotes</h2>
+      </div>
+      <a href="{% url 'accounts:quote-list' %}">View all quotes</a>
+    </div>
+    {% if recent_quotes %}
+      <ul class="quote-list">
+        {% for quote in recent_quotes %}
+          <li>
+            <div class="quote-list__meta">
+              <a href="{% url 'quotes:detail' pk=quote.pk %}"><strong>{{ quote.project_title|default:"Untitled quote" }}</strong></a>
+              <span class="status-pill status-pill--muted">{{ quote.get_status_display }}</span>
+              <span class="quote-list__amount">{{ quote.currency }} {{ quote.chosen_total }}</span>
+            </div>
+            <span class="muted">Updated {{ quote.updated_at|date:"j M Y" }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-state">
+        <h3>No quotes yet</h3>
+        <p>Start with an estimate, then turn the result into a draft when the scope feels right.</p>
+        <a class="button button--primary" href="{% url 'quotes:estimator' %}">Estimate your first project</a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

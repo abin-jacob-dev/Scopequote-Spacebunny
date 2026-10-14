@@ -1,0 +1,7 @@
+Django>=5.2,<6.0
+psycopg[binary]>=3.2,<4.0
+Pillow>=11.0,<12.0
+WeasyPrint>=66.0,<67.0
+WhiteNoise>=6.9,<7.0
+gunicorn>=23.0,<24.0
+cryptography>=44.0,<46.0

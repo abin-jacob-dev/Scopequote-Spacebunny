@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load form_extras %}
+
+{% block title %}Verify your email — Scopequote{% endblock %}
+{% block meta_description %}Verify your Scopequote email before publishing private client links.{% endblock %}
+{% block body_class %}account-page{% endblock %}
+
+{% block content %}
+  <section class="form-shell measure" aria-labelledby="verify-title">
+    <h1 id="verify-title">Email verification</h1>
+    {% if verification_failed %}
+      <div class="error-summary" role="alert"><p>This verification link is invalid or has expired. Request a new link below.</p></div>
+    {% elif verified %}
+      <p class="alert alert-success" role="status">Your email address is verified. You can publish private client links.</p>
+      <p><a class="button button--primary" href="{% url 'accounts:login' %}">Continue to sign in</a></p>
+    {% else %}
+      <p class="lede">We sent a verification link to {% if email %}{{ email }}{% else %}your email address{% endif %}.</p>
+      <p>Verification is required before publishing a private client link.</p>
+    {% endif %}
+
+    {% if form %}
+      <form method="post" action="{% url 'accounts:verify-notice' %}" data-scopequote-pending>
+        {% csrf_token %}
+         {% if form.errors %}
+           <div class="error-summary" role="alert" aria-labelledby="verify-errors-title">
+             <h2 id="verify-errors-title" tabindex="-1" data-scopequote-focus-target="true">Check the details below and try again.</h2>
+             <ul class="error-list">
+               {% if form.non_field_errors %}{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}{% endif %}
+               {% for field in form %}{% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}{% endfor %}
+             </ul>
+           </div>
+         {% endif %}
+        <div class="form-field">
+          <label for="{{ form.email.id_for_label }}">Email address</label>
+           {% field form.email %}
+           {% if form.email.errors %}<ul id="{{ form.email.id_for_label }}_error" class="field-errors" role="alert">{% for error in form.email.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+         <div class="button-row"><button class="button button--primary" type="submit">Send another link</button><span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span></div>
+      </form>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Scopequote{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Explainable project pricing for independent freelancers.{% endblock %}">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    {% block head_extra %}{% endblock %}
+  </head>
+  <body class="{% block body_class %}{% endblock %}">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="site-header-region">
+      <header><a href="/" aria-label="Scopequote home">Scopequote</a></header>
+      <div class="site-header__tools">
+        <nav class="site-nav" aria-label="Primary navigation">
+          <a href="{% url 'quotes:estimator' %}">Estimate</a>
+          {% if request.user.is_authenticated %}
+            <a href="{% url 'accounts:dashboard' %}">Dashboard</a>
+            <a href="{% url 'accounts:quote-list' %}">Quotes</a>
+          {% else %}
+            <a href="{% url 'accounts:login' %}">Sign in</a>
+          {% endif %}
+        </nav>
+        <div class="site-header__actions">
+          {% if request.user.is_authenticated %}
+            <a href="{% url 'accounts:profile' %}">Settings</a>
+             <form method="post" action="{% url 'accounts:logout' %}" data-scopequote-pending>
+              {% csrf_token %}
+               <button class="button button--quiet button--small" type="submit">Sign out</button>
+               <span class="toast-status" data-scopequote-pending-status role="status" aria-live="polite" hidden></span>
+            </form>
+          {% else %}
+            <a class="button button--small" href="{% url 'accounts:signup' %}">Create account</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% if messages %}
+      <div class="messages" aria-live="polite">
+        {% for message in messages %}
+          <div class="message message-{{ message.tags }}" role="{% if 'error' in message.tags %}alert{% else %}status{% endif %}" data-scopequote-dismissible>
+            <span>{{ message }}</span>
+            <button class="message__dismiss" type="button" data-scopequote-dismiss aria-label="Dismiss message">Dismiss</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <main id="main-content" class="page-main">
+      <div class="page-shell">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <div>
+          <p class="metadata">Scopequote</p>
+          <p>Explainable pricing for careful work.</p>
+        </div>
+        <nav class="site-footer__links" aria-label="Legal navigation">
+          <a href="{% url 'core:privacy' %}">Privacy</a>
+          <a href="{% url 'core:terms' %}">Terms</a>
+        </nav>
+      </div>
+    </footer>
+    <script src="{% static 'js/pricing-preview.js' %}" defer></script>
+    <script src="{% static 'js/estimator.js' %}" defer></script>
+    <script src="{% static 'js/quote-actions.js' %}" defer></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
